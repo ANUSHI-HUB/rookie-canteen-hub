@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { UtensilsCrossed, ArrowLeft } from "lucide-react";
+import { UtensilsCrossed, ArrowLeft, User } from "lucide-react";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -15,12 +15,35 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("student");
   const [adminCode, setAdminCode] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
   const { register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Secure admin access code (In production, this should be server-side)
   const ADMIN_ACCESS_CODE = "ROOKIES2024";
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please choose an image smaller than 2MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +58,7 @@ export default function Register() {
       return;
     }
     
-    const success = register(name, username, password, role);
+    const success = register(name, username, password, role, avatarPreview);
     
     if (success) {
       toast({
@@ -66,6 +89,38 @@ export default function Register() {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-5">
+          {/* Avatar Upload */}
+          <div className="space-y-3">
+            <Label htmlFor="avatar">Profile Picture (Optional)</Label>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar preview"
+                    className="h-20 w-20 rounded-full object-cover border-2 border-primary"
+                  />
+                ) : (
+                  <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center border-2 border-border">
+                    <User className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <Input
+                  id="avatar"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Max 2MB. JPG, PNG, or GIF
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="role">Register as</Label>
             <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>

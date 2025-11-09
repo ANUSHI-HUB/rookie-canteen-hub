@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, LogOut, History, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -68,9 +69,12 @@ export default function StudentDashboard() {
       {/* Header */}
       <header className="bg-gradient-primary text-white shadow-lg">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Welcome, {user?.name}!</h1>
-            <p className="text-sm opacity-90">Student Portal</p>
+          <div className="flex items-center gap-3">
+            <UserAvatar name={user?.name || ""} avatar={user?.avatar} size="lg" />
+            <div>
+              <h1 className="text-2xl font-bold">Welcome, {user?.name}!</h1>
+              <p className="text-sm opacity-90">Student Portal</p>
+            </div>
           </div>
           <Button variant="secondary" onClick={handleLogout} className="gap-2">
             <LogOut className="h-4 w-4" />

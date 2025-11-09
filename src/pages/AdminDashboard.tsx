@@ -3,6 +3,7 @@ import { useMenu } from "@/contexts/MenuContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { UserAvatar } from "@/components/UserAvatar";
 import { LogOut, Users, Store, ShoppingBag, TrendingUp } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -23,9 +24,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <header className="bg-gradient-primary text-white shadow-lg">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-sm opacity-90">Welcome, {user?.name}</p>
+          <div className="flex items-center gap-3">
+            <UserAvatar name={user?.name || ""} avatar={user?.avatar} size="lg" />
+            <div>
+              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <p className="text-sm opacity-90">Welcome, {user?.name}</p>
+            </div>
           </div>
           <Button variant="secondary" onClick={handleLogout} className="gap-2">
             <LogOut className="h-4 w-4" />
