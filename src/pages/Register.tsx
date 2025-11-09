@@ -14,12 +14,27 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("student");
+  const [adminCode, setAdminCode] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Secure admin access code (In production, this should be server-side)
+  const ADMIN_ACCESS_CODE = "ROOKIES2024";
+
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate admin access code
+    if (role === "admin" && adminCode !== ADMIN_ACCESS_CODE) {
+      toast({
+        title: "Invalid access code",
+        description: "Please enter the correct admin access code.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const success = register(name, username, password, role);
     
     if (success) {
@@ -54,15 +69,37 @@ export default function Register() {
           <div className="space-y-2">
             <Label htmlFor="role">Register as</Label>
             <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
-              <SelectTrigger id="role">
+              <SelectTrigger id="role" className="bg-background">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover z-50">
                 <SelectItem value="student">Student</SelectItem>
                 <SelectItem value="shop">Shop Owner</SelectItem>
+                <SelectItem value="admin">Admin (Requires Access Code)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {role === "admin" && (
+            <div className="space-y-2 p-4 bg-muted/50 rounded-lg border border-primary/20">
+              <Label htmlFor="adminCode" className="flex items-center gap-2">
+                Admin Access Code
+                <span className="text-xs text-muted-foreground">(Required)</span>
+              </Label>
+              <Input
+                id="adminCode"
+                type="password"
+                value={adminCode}
+                onChange={(e) => setAdminCode(e.target.value)}
+                placeholder="Enter admin access code"
+                required
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground">
+                Contact system administrator for access code
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
@@ -102,6 +139,14 @@ export default function Register() {
             Register
           </Button>
         </form>
+
+        {role === "admin" && (
+          <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-accent/20">
+            <p className="text-xs text-center text-muted-foreground">
+              <strong>Demo Code:</strong> ROOKIES2024
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 text-center">
           <Button
